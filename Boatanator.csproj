@@ -65,6 +65,12 @@
     <Content Include="Content\logo.jpg" />
     <Content Include="Content\number.jpg" />
     <Content Include="Content\skyhalf.jpg" />
+    <Content Include="Content\tex\Enviroment Image.jpg" />
+    <Content Include="Content\tex\fuselage.jpg" />
+    <Content Include="Content\tex\land.jpg" />
+    <Content Include="Content\tex\pal.jpg" />
+    <Content Include="Content\tex\panel.jpg" />
+    <Content Include="Content\tex\Plt.jpg" />
     <Content Include="Content\Water.fx" />
     <Content Include="Icon.ico" />
   </ItemGroup>
@@ -72,6 +78,7 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Black Hawk uh-60.fbx" />
     <None Include="Content\boat.fbx" />
     <None Include="Content\font.spritefont" />
     <None Include="Content\wave2.dds" />

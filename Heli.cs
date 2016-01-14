@@ -57,6 +57,7 @@ namespace Boatanator.Content
             var up = Up;
             var right = Vector3.Cross(dir, Up);
             float power = 100;
+            
             ///////////////////////////////////////
             // Collective
             ///////////////////////////////////////
@@ -113,26 +114,17 @@ namespace Boatanator.Content
 
             
 
-            float accup = (float)Math.Cos(pitch) * (float)Math.Cos(roll) * strength;
-            float accright = (float)Math.Sin(roll) * strength;
-            float accforward = (float)Math.Sin(pitch) * strength;
+            float accUp = (float)Math.Cos(pitch) * (float)Math.Cos(roll) * strength;
+            float accRight = (float)Math.Sin(roll) * strength;
+            float accForward = (float)Math.Sin(pitch) * strength;
 
-            Vector3 accrotor = new Vector3(accforward, accup, accright);
-
-            dir += accforward*Vector3.Normalize(dir);
-            dir += accup * Vector3.Cross(dir, right) * 1000 ;
+            Vector3 accRotor = new Vector3(accForward, accUp, accRight); // it must be parallel to the cross of dir and right (up)
+            Vector3 transformedAccRotor = Vector3.Transform(accRotor, world) * collective;
+            //Vector3.
+            //dir += accforward*Vector3.Normalize(dir);
+            //vertices[4].A += (accup*power) * Vector3.Cross(dir, right)  ;
             
-            
-            
-
-
-
-
-            
-
-
-
-            Vector3 tailacc = Vector3.Zero;
+            Vector3 tailAcc = Vector3.Zero;
             Vector3 acc = Vector3.Zero;
 
 
@@ -141,9 +133,9 @@ namespace Boatanator.Content
             
 
             if (q)
-                tailacc = Vector3.Normalize(dir + right)*10;
+                tailAcc = Vector3.Normalize(dir + right)*10;
             if (e)
-                tailacc = Vector3.Normalize(dir - right)*10;
+                tailAcc = Vector3.Normalize(dir - right)*10;
             if (pitch < 15 & w)
                 pitch += 0.005f;
             if (pitch > -15 & s)
@@ -195,8 +187,8 @@ namespace Boatanator.Content
                 }
                 
             }
-            //vertices[4].A += accrotor;
-            vertices[5].A += tailacc;
+            vertices[4].A += accRotor;    //add forces to the vertices
+            vertices[5].A += tailAcc;
             
 
 
