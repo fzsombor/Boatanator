@@ -114,9 +114,9 @@ namespace Boatanator.Content
 
             
 
-            float accUp = (float)Math.Cos(roll) * (float)Math.Cos(pitch) * strength;
-            float accRight = (float)Math.Sin(pitch) * strength;
-            float accForward = (float)Math.Sin(roll) * strength;
+            float accUp = (float)Math.Cos(pitch) * (float)Math.Cos(roll) * strength;
+            float accRight = (float)Math.Sin(roll) * strength;
+            float accForward = (float)Math.Sin(pitch) * strength;
 
             Vector3 accRotor = new Vector3(accForward, accUp, accRight); // it must be parallel to the cross of dir and right (up)
             Vector4 v4temp = Vector4.Transform(new Vector4(accRotor,0), world);
