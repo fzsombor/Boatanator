@@ -50,152 +50,186 @@ namespace Boatanator.Content
             model.Draw(local*world, cam.View, cam.Projection);
         }
 
-        public void Step(bool w, bool s, bool a, bool d, bool q, bool e, bool o, bool l)
+        public void Step(bool w, bool s, bool a, bool d, bool q, bool e, bool o, bool l, bool autoHover)
         {
             
             var dir = Direction;
             var up = Up;
             var right = Vector3.Cross(dir, Up);
             float power = 200;
-            
-            ///////////////////////////////////////
-            // Collective
-            ///////////////////////////////////////
-            if(collective<1.0f & collective>0)
+            if(autoHover)
             {
-                if (o)
-                    collective += 0.005f;
-                if (l)
-                    collective -= 0.005f;
-            }
+                vertices[1].Pos.Y = vertices[0].Pos.Y;
+                vertices[2].Pos.Y = vertices[0].Pos.Y;
+                vertices[3].Pos.Y = vertices[0].Pos.Y;
+                vertices[4].Pos.Y = vertices[0].Pos.Y+1;
+                vertices[5].Pos.Y = vertices[0].Pos.Y-0.5f;
 
-            ///////////////////////////////////////
-            // Gravity
-            ///////////////////////////////////////
-            float g = 8;
-            for (int i = 0; i < vertices.Length; i++)
-            {
-                vertices[i].A = new Vector3(0, -g, 0);
-            }
-
-            ///////////////////////////////////////
-            // Lift
-            ///////////////////////////////////////
-
-          //  vertices[4].A += new Vector3(0, power*collective, 0);
-
-           // for (int i = 0; i < 4; i++)
-           // {
-           //     if (vertices[i].Pos.Y < 0)
-           //     vertices[i].A += new Vector3(0, Math.Max(0, Math.Min(20, (1.3f-vertices[i].Pos.Y) * g)), 0);
-           // }
-
-            ///////////////////////////////////////
-            // Friction
-            ///////////////////////////////////////
-            for (int i = 0; i < 4; i++)
-            {
-                if (vertices[i].Pos.Y < 0)
+                foreach (var b in vertices)
                 {
-                    vertices[i].AddSqFriction(dir, 0.001f);
-                    vertices[i].AddSqFriction(right, 0.1f);
-                    vertices[i].AddSqFriction(up, 1f);
+                    b.pPos = b.Pos;
+                    b.A = Vector3.Zero;
+                   
                 }
-            }
-
-
-
-            ///////////////////////////////////////
-            // Control
-            ///////////////////////////////////////
-
-           
-            var strength = collective * power + 0.05f;
-
-            
-
-            float accUp = (float)Math.Cos(pitch) * (float)Math.Cos(roll) * strength;
-            float accRight = (float)Math.Sin(roll) * strength;
-            float accForward = (float)Math.Sin(pitch) * strength;
-
-           
-
-            Vector3 accRotor = new Vector3(accRight, accUp, -accForward); 
-            Vector4 v4temp = Vector4.Transform(new Vector4(accRotor,0), world);
-            Vector3 transformedAccRotor = new Vector3(v4temp.X, v4temp.Y, v4temp.Z) * collective;
-            //Vector3.
-            //dir += accforward*Vector3.Normalize(dir);
-            //vertices[4].A += (accup*power) * Vector3.Cross(dir, right)  ;
-            
-            Vector3 tailAcc = Vector3.Zero;
-            Vector3 acc = Vector3.Zero;
-
-
-
-            
-            
-
-            if (q)
-                tailAcc = Vector3.Normalize(dir + right)*10;
-            if (e)
-                tailAcc = Vector3.Normalize(dir - right)*10;
-            if (pitch < 15 & w)
-                pitch += 0.005f;
-            if (pitch > -15 & s)
-                pitch -= 0.005f;
-            if (roll > -15 & a)
-                roll -= 0.005f;
-            if (roll < 15 & d)
-                roll += 0.005f;
-            
-
-
-            
-            //float strength = 20;
-            float small = 2;
-
-            
-
-            if (vertices[5].Pos.Y < 0)
-            {
+                pitch = 0;
+                roll = 0;
                 if (w)
                 {
-                    if (d)
+                    foreach (var verlet in vertices)
                     {
-                        acc = Vector3.Normalize(dir - right) * strength;
+                        verlet.Pos.X += dir.X * 0.5f;
+                        verlet.Pos.Z += dir.Z * 0.5f;
                     }
-                    else if (a)
-                    {
-                        acc = Vector3.Normalize(dir + right) * strength;
-                    }
-                    else
-                    {
-                        acc = dir * strength;
-                    }
+                    vertices[2].Pos.Y += 1;
+                    vertices[3].Pos.Y += 1;
+                    vertices[5].Pos.Y += 1;
                 }
-                else
+                if (s)
                 {
-                    if (d)
+                    foreach (var verlet in vertices)
                     {
-                        acc = -right * small;
+                        verlet.Pos.X -= dir.X * 0.5f;
+                        verlet.Pos.Z -= dir.Z * 0.5f;
                     }
-                    else if (a)
+                    vertices[2].Pos.Y -= 1;
+                    vertices[3].Pos.Y -= 1;
+                    vertices[5].Pos.Y -= 1;
+                }
+                if (d)
+                {
+                    foreach (var verlet in vertices)
                     {
-                        acc = right * small;
+                        verlet.Pos.X += right.X * 0.3f;
+                        verlet.Pos.Z += right.Z * 0.3f;
                     }
-                    else if (s)
+                    
+                }
+                if (a)
+                {
+                    foreach (var verlet in vertices)
                     {
-                        acc = -dir * strength / 2;
+                        verlet.Pos.X -= right.X * 0.3f;
+                        verlet.Pos.Z -= right.Z * 0.3f;
+                    }
+                   
+                }
+                if (o)
+                    foreach (var verlet in vertices)
+                    {
+                        verlet.Pos.Y += 0.5f;
+                    }
+                if (l)
+                    foreach (var verlet in vertices)
+                    {
+                        verlet.Pos.Y -= 0.5f;
+                    }
+
+               
+            }
+            else
+            {
+
+                ///////////////////////////////////////
+                // Collective
+                ///////////////////////////////////////
+                if (collective < 1.0f & collective > 0)
+                {
+                    if (o)
+                        collective += 0.005f;
+                    if (l)
+                        collective -= 0.005f;
+                }
+
+                ///////////////////////////////////////
+                // Gravity
+                ///////////////////////////////////////
+                float g = 8;
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    vertices[i].A = new Vector3(0, -g, 0);
+                }
+
+                ///////////////////////////////////////
+                // Lift
+                ///////////////////////////////////////
+
+                //  vertices[4].A += new Vector3(0, power*collective, 0);
+
+                // for (int i = 0; i < 4; i++)
+                // {
+                //     if (vertices[i].Pos.Y < 0)
+                //     vertices[i].A += new Vector3(0, Math.Max(0, Math.Min(20, (1.3f-vertices[i].Pos.Y) * g)), 0);
+                // }
+
+                ///////////////////////////////////////
+                // Friction
+                ///////////////////////////////////////
+                for (int i = 0; i < 4; i++)
+                {
+                    if (vertices[i].Pos.Y < 0)
+                    {
+                        vertices[i].AddSqFriction(dir, 0.001f);
+                        vertices[i].AddSqFriction(right, 0.1f);
+                        vertices[i].AddSqFriction(up, 1f);
                     }
                 }
+
+
+
+                ///////////////////////////////////////
+                // Control
+                ///////////////////////////////////////
+
+
+                var strength = collective * power + 0.05f;
+
+
+
+                float accUp = (float)Math.Cos(pitch) * (float)Math.Cos(roll) * strength;
+                float accRight = (float)Math.Sin(roll) * strength;
+                float accForward = (float)Math.Sin(pitch) * strength;
+
+
+
+                Vector3 accRotor = new Vector3(accRight, accUp, -accForward);
+                Vector4 v4temp = Vector4.Transform(new Vector4(accRotor, 0), world);
+                Vector3 transformedAccRotor = new Vector3(v4temp.X, v4temp.Y, v4temp.Z) * collective;
+                //Vector3.
+                //dir += accforward*Vector3.Normalize(dir);
+                //vertices[4].A += (accup*power) * Vector3.Cross(dir, right)  ;
+
+                Vector3 tailAcc = Vector3.Zero;
+                Vector3 acc = Vector3.Zero;
+
+
+
+
+
+
+                if (q)
+                    tailAcc = Vector3.Normalize(dir + right) * 10;
+                if (e)
+                    tailAcc = Vector3.Normalize(dir - right) * 10;
+                if (pitch < 15 & w)
+                    pitch += 0.005f;
+                if (pitch > -15 & s)
+                    pitch -= 0.005f;
+                if (roll > -15 & a)
+                    roll -= 0.005f;
+                if (roll < 15 & d)
+                    roll += 0.005f;
+
+
                 
+                vertices[4].A += transformedAccRotor;    //add forces to the vertices
+                vertices[5].A += tailAcc;
+
+                base.Step();
             }
-            vertices[4].A += transformedAccRotor;    //add forces to the vertices
-            vertices[5].A += tailAcc;
             
 
 
-            base.Step();
+            
         }
 
         public Vector3 Position { get { return (vertices[0].Pos + vertices[2].Pos) * 0.5f; } }

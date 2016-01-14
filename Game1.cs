@@ -22,6 +22,7 @@ namespace Boatanator
         //Boat boat = new Boat();
         Heli heli = new Heli();
         Sky sky;
+        Boolean autoHover = true;
         Camera freeCam = new Camera();
         Camera camBoat = new Camera();
         Camera cam;
@@ -103,9 +104,21 @@ namespace Boatanator
 
             var ks = Keyboard.GetState();
             bool w = false, a = false, s = false, d = false, q = false, e = false, o = false, l = false;
-            
-         
 
+
+            if (autoHover)
+            {
+                if (ks.IsKeyDown(Keys.Space))
+                    autoHover = false;
+            }
+            else
+            {
+                if (ks.IsKeyDown(Keys.Space))
+                    autoHover = true;
+            }
+
+                
+             
 
 
             if(cam == freeCam)
@@ -144,7 +157,7 @@ namespace Boatanator
 
 
             
-            heli.Step(w,s,a,d,q,e,o,l);
+            heli.Step(w,s,a,d,q,e,o,l, autoHover);
             camBoat.Position = heli.Position - new Vector3(heli.Direction.X, 0, heli.Direction.Z)*10+new Vector3(0,4,0);
             camBoat.Target = heli.Position + new Vector3(0, 2, 0);
             //camBoat.Direction = boat.Position;
@@ -161,7 +174,7 @@ namespace Boatanator
             cam.Direction = Vector3.Transform(cam.Direction, m);
 
             foreach (var b in helis.Values)
-                b.Step(false, false, false, false, false, false, false, false);
+                b.Step(false, false, false, false, false, false, false, false, false);
                 
        
 
@@ -210,7 +223,7 @@ namespace Boatanator
             }
 
 
-
+            
             base.Update(gameTime);
         }
 
@@ -262,7 +275,7 @@ namespace Boatanator
             water.Draw(cam, gameTime, reflectionMap);
 
             spriteBatch.Begin();
-            //spriteBatch.Draw(reflectionMap, new Rectangle(0, 0, 100, 60), Color.White);
+            
             var pos = GraphicsDevice.Viewport.Project(heli.Position, cam.Projection, cam.View, Matrix.Identity);
             spriteBatch.DrawString(font, heli.nickname, new Vector2(pos.X, pos.Y - 100), heli.color);
             foreach (var b in helis)
@@ -272,14 +285,24 @@ namespace Boatanator
             spriteBatch.DrawString(font, b.Key, new Vector2(posb.X, posb.Y - 80), b.Value.color);
             }
 
-
+            
             spriteBatch.DrawString(font, "Collective: " + heli.collective.ToString(), new Vector2(10, 1), heli.color);
             spriteBatch.DrawString(font, "Roll: " + heli.roll.ToString(), new Vector2(10,25), heli.color);
             spriteBatch.DrawString(font, "Pitch: " + heli.pitch.ToString(), new Vector2(10, 50), heli.color);
-            spriteBatch.DrawString(font, Math.Sin(heli.pitch).ToString(), new Vector2(10, 75), heli.color);
+            spriteBatch.DrawString(font, "Autohover: " + autoHover, new Vector2(10, 75), heli.color);
             spriteBatch.DrawString(font, Math.Sin(heli.roll).ToString(), new Vector2(10, 100), heli.color);
             spriteBatch.DrawString(font, (Math.Cos(heli.pitch)*Math.Cos(heli.roll)).ToString(), new Vector2(10, 125), heli.color);
-           
+            if (heli.vertices[5].Pos.Y < 0)
+            {
+                spriteBatch.Draw(reflectionMap, new Rectangle(0, 0, 10000, 10000), Color.Black);
+                spriteBatch.DrawString(font, "Game Over", new Vector2(400, 300), Color.Red);
+
+                foreach (var v in heli.vertices)
+                {
+                    v.Pos.Y = -100;
+                }
+
+            }
             spriteBatch.End();
             GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
