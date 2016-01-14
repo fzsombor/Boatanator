@@ -118,7 +118,9 @@ namespace Boatanator.Content
             float accRight = (float)Math.Sin(roll) * strength;
             float accForward = (float)Math.Sin(pitch) * strength;
 
-            Vector3 accRotor = new Vector3(accForward, accUp, accRight); // it must be parallel to the cross of dir and right (up)
+           
+
+            Vector3 accRotor = new Vector3(accRight, accUp, -accForward); 
             Vector4 v4temp = Vector4.Transform(new Vector4(accRotor,0), world);
             Vector3 transformedAccRotor = new Vector3(v4temp.X, v4temp.Y, v4temp.Z) * collective;
             //Vector3.
