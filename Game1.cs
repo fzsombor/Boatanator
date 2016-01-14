@@ -290,8 +290,21 @@ namespace Boatanator
             spriteBatch.DrawString(font, "Roll: " + heli.roll.ToString(), new Vector2(10,25), heli.color);
             spriteBatch.DrawString(font, "Pitch: " + heli.pitch.ToString(), new Vector2(10, 50), heli.color);
             spriteBatch.DrawString(font, "Autohover: " + autoHover, new Vector2(10, 75), heli.color);
-            spriteBatch.DrawString(font, Math.Sin(heli.roll).ToString(), new Vector2(10, 100), heli.color);
+          
+            spriteBatch.DrawString(font, heli.Position.X.ToString(), new Vector2(10, 100), heli.color);
             spriteBatch.DrawString(font, (Math.Cos(heli.pitch)*Math.Cos(heli.roll)).ToString(), new Vector2(10, 125), heli.color);
+            if (heli.Position.X > 500 || heli.Position.X < -500 || heli.Position.Y > 500 || heli.Position.Y < -500)
+                spriteBatch.DrawString(font, "Unauthorized territory! Get back to the islands now!", new Vector2(200, 300), Color.Red);
+            if (heli.vertices[5].Pos.Y >= 200)
+            {
+                spriteBatch.DrawString(font, "Maximum Altitude", new Vector2(400, 300), Color.Red);
+
+                foreach (var v in heli.vertices)
+                {
+                    v.A = Vector3.Zero;
+                    v.Pos.Y = 200;
+                }
+            }
             if (heli.vertices[5].Pos.Y < 0)
             {
                 spriteBatch.Draw(reflectionMap, new Rectangle(0, 0, 10000, 10000), Color.Black);
