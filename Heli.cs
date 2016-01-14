@@ -56,7 +56,7 @@ namespace Boatanator.Content
             var dir = Direction;
             var up = Up;
             var right = Vector3.Cross(dir, Up);
-            float power = 100;
+            float power = 200;
             
             ///////////////////////////////////////
             // Collective
@@ -114,12 +114,13 @@ namespace Boatanator.Content
 
             
 
-            float accUp = (float)Math.Cos(pitch) * (float)Math.Cos(roll) * strength;
-            float accRight = (float)Math.Sin(roll) * strength;
-            float accForward = (float)Math.Sin(pitch) * strength;
+            float accUp = (float)Math.Cos(roll) * (float)Math.Cos(pitch) * strength;
+            float accRight = (float)Math.Sin(pitch) * strength;
+            float accForward = (float)Math.Sin(roll) * strength;
 
             Vector3 accRotor = new Vector3(accForward, accUp, accRight); // it must be parallel to the cross of dir and right (up)
-            Vector3 transformedAccRotor = Vector3.Transform(accRotor, world) * collective;
+            Vector4 v4temp = Vector4.Transform(new Vector4(accRotor,0), world);
+            Vector3 transformedAccRotor = new Vector3(v4temp.X, v4temp.Y, v4temp.Z) * collective;
             //Vector3.
             //dir += accforward*Vector3.Normalize(dir);
             //vertices[4].A += (accup*power) * Vector3.Cross(dir, right)  ;
@@ -187,7 +188,7 @@ namespace Boatanator.Content
                 }
                 
             }
-            vertices[4].A += accRotor;    //add forces to the vertices
+            vertices[4].A += transformedAccRotor;    //add forces to the vertices
             vertices[5].A += tailAcc;
             
 
